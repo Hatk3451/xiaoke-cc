@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden;
+    font-family: "Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif; }
+  .box { position: absolute; left: 12px; right: 12px; top: 14px; height: 58px; box-sizing: border-box;
+    display: flex; align-items: center; gap: 14px; padding: 0 20px;
+    background: #fbfbfd; border: 1px solid #dcdce3; border-radius: 16px;
+    box-shadow: 0 6px 22px rgba(20, 20, 19, .16), 0 1px 3px rgba(20, 20, 19, .08);
+    animation: pop .14s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
+  svg { flex: none; }
+  input { flex: 1; border: 0; outline: 0; background: transparent; font-size: 17px; color: #2b2925; }
+  input::placeholder { color: #6f6e77; }
+</style>
+</head>
+<body>
+<div class="box">
+  <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+    <g stroke="#d97757" stroke-width="2.6" stroke-linecap="round">
+      <line x1="12" y1="2.5" x2="12" y2="9" />
+      <line x1="12" y1="15" x2="12" y2="21.5" />
+      <line x1="2.5" y1="12" x2="9" y2="12" />
+      <line x1="15" y1="12" x2="21.5" y2="12" />
+      <line x1="5.3" y1="5.3" x2="9.6" y2="9.6" />
+      <line x1="14.4" y1="14.4" x2="18.7" y2="18.7" />
+      <line x1="18.7" y1="5.3" x2="14.4" y2="9.6" />
+      <line x1="9.6" y1="14.4" x2="5.3" y2="18.7" />
+      <line x1="8.4" y1="3.2" x2="10.4" y2="8.6" />
+      <line x1="15.6" y1="20.8" x2="13.6" y2="15.4" />
+      <line x1="20.8" y1="8.4" x2="15.4" y2="10.4" />
+      <line x1="3.2" y1="15.6" x2="8.6" y2="13.6" />
+    </g>
+  </svg>
+  <input id="q" placeholder="What can I help you with today?" autofocus spellcheck="false">
+</div>
+<script>
+const q = document.getElementById('q')
+q.focus()
+q.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); window.xk.quickSubmit(q.value) }
+  if (e.key === 'Escape') window.xk.quickClose()
+})
+</script>
+</body>
+</html>

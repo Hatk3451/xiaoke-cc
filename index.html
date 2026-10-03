@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; media-src 'self'; img-src 'self'">
+<style>
+  :root { --coral: #d97757; --ink: #2b2925; --sand: #faf9f5; --brown: #8a5a44; --grey: #a09d96; }
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; user-select: none;
+    font-family: "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif; }
+  #stage { position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 4px; display: flex; flex-direction: column; align-items: center; }
+  #char { display: block; transform-origin: 50% 100%; transition: transform .12s cubic-bezier(.3,1.6,.5,1); cursor: grab;
+    filter: drop-shadow(0 3px 4px rgba(20,20,19,.25)); -webkit-user-drag: none; }
+  #char.press { transform: scale(1.07, .88); transition-duration: .06s; }
+  #char.dragging { cursor: grabbing; }
+  #badge { margin-top: -16px; position: relative; z-index: 2; width: 176px; box-sizing: border-box; padding: 5px 9px 7px;
+    border-radius: 10px; background: var(--sand); border: 1.5px solid #e6dccf; color: var(--ink); cursor: pointer;
+    box-shadow: 0 2px 6px rgba(20,20,19,.16); }
+  #badge .row { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; white-space: nowrap; }
+  #badge .row span { color: #5f5b54; }
+  #badge .row b { font-size: 11px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  #badge .track { margin-top: 4px; height: 7px; border-radius: 999px; background: #eee5da; overflow: hidden; }
+  #badge .fill { height: 100%; width: 100%; border-radius: 999px; background: var(--coral); transition: width .6s ease; }
+  #badge .fill.low { background: #c64545; }
+  #bubble input.pct { width: 64px; margin: 6px 4px 0; padding: 3px 6px; border: 1.5px solid var(--coral); border-radius: 6px;
+    background: #fff; color: var(--ink); font-size: 14px; text-align: center; outline: 0; }
+  #bubble { position: absolute; left: 50%; transform: translateX(-50%) scale(.6); transform-origin: 50% 100%;
+    max-width: 260px; min-width: 90px; box-sizing: border-box; padding: 10px 14px; border-radius: 16px;
+    background: var(--sand); border: 3px solid var(--coral); color: var(--brown); font-size: 14px; line-height: 1.45;
+    text-align: center; opacity: 0; pointer-events: none; transition: opacity .15s, transform .2s cubic-bezier(.3,1.5,.5,1);
+    box-shadow: 0 3px 8px rgba(20,20,19,.18); word-break: break-word; }
+  #bubble.show { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
+  #bubble::after { content: ""; position: absolute; left: 50%; bottom: -11px; width: 16px; height: 16px; margin-left: -8px;
+    background: var(--sand); border-right: 3px solid var(--coral); border-bottom: 3px solid var(--coral); transform: rotate(45deg); }
+  #bubble .big { font-size: 20px; font-weight: 700; color: var(--coral); }
+  #bubble .sub { font-size: 11px; color: var(--grey); }
+  #bubble table { border-collapse: collapse; margin: 4px auto 0; font-size: 12px; color: var(--ink); }
+  #bubble td { padding: 1px 4px; text-align: left; }
+  #bubble td.r { text-align: right; font-variant-numeric: tabular-nums; }
+  .bars { display: flex; align-items: flex-end; gap: 4px; height: 46px; margin: 6px auto 2px; justify-content: center; }
+  .bars div { width: 22px; background: #e8e0d2; border-radius: 3px 3px 0 0; position: relative; }
+  .bars div.today { background: var(--coral); }
+  .bars span { position: absolute; bottom: -14px; left: 0; right: 0; font-size: 9px; color: var(--grey); text-align: center; }
+  .lbl { height: 14px; }
+</style>
+</head>
+<body>
+<div id="bubble"></div>
+<div id="stage">
+  <img id="char" src="assets/xiaoke1.png" draggable="false">
+  <div id="badge"><div class="row"><span>Weekly · all models</span><b id="pct">…</b></div><div class="track"><div class="fill" id="fill"></div></div></div>
+</div>
+<script>
+const $ = s => document.querySelector(s)
+const charEl = $('#char'), badge = $('#badge'), bubble = $('#bubble')
+let cfg = { scale: 1, sound: true, volume: 0.5, turnBubble: true, turnSound: true, turnSeconds: 8, currency: 'USD', cnyRate: 7.1 }
+let stats = null
+let lines = []
+let lastIdx = -1
+let hideTimer = null
+
+// ---------- 金额 ----------
+function money(usd, digits) {
+  const cny = cfg.currency === 'CNY'
+  const v = cny ? usd * cfg.cnyRate : usd
+  const sym = cny ? '¥' : '$'
+  if (v > 0 && v < 0.01) return '<' + sym + '0.01'
+  const d = digits ?? (v < 1 ? 3 : 2)
+  return sym + v.toFixed(d)
+}
+
+// ---------- 尺寸 ----------
+function applyScale() {
+  charEl.style.width = Math.round(170 * cfg.scale) + 'px'
+  placeBubble()
+}
+function placeBubble() {
+  const h = $('#stage').offsetHeight
+  bubble.style.bottom = (h + 6) + 'px'
+}
+
+// ---------- 泡泡 ----------
+function say(html, seconds = 4) {
+  bubble.innerHTML = html
+  placeBubble()
+  bubble.classList.add('show')
+  clearTimeout(hideTimer)
+  if (seconds > 0) hideTimer = setTimeout(() => bubble.classList.remove('show'), seconds * 1000)
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+
+function pickLine() {
+  if (!lines.length) return '...'
+  const total = lines.reduce((a, l) => a + (l.weight || 1), 0)
+  for (let tries = 0; tries < 5; tries++) {
+    let r = Math.random() * total
+    for (let i = 0; i < lines.length; i++) {
+      r -= lines[i].weight || 1
+      if (r <= 0) { if (i !== lastIdx || lines.length === 1) { lastIdx = i; return lines[i].text } break }
+    }
+  }
+  lastIdx = (lastIdx + 1) % lines.length
+  return lines[lastIdx].text
+}
+
+// ---------- 音效 ----------
+const pokeSounds = ['D1.mp3', 'D2.mp3', 'Ya1.mp3', 'Ya2.mp3']
+function play(file) {
+  const a = new Audio('assets/' + file)
+  a.volume = cfg.volume
+  a.play().catch(() => {})
+}
+
+// ---------- 交互 ----------
+function poke() {
+  charEl.classList.add('press')
+  setTimeout(() => charEl.classList.remove('press'), 140)
+  if (cfg.sound) play(pokeSounds[Math.floor(Math.random() * pokeSounds.length)])
+  say(esc(pickLine()), 4)
+}
+
+function showStats() {
+  if (!stats) { say('还在翻账本...等我一下', 3); return }
+  const days = Object.entries(stats.days)
+  const max = Math.max(...days.map(d => d[1]), 0.0001)
+  const todayKey = days[days.length - 1][0]
+  const bars = days.map(([d, v]) =>
+    `<div class="${d === todayKey ? 'today' : ''}" style="height:${Math.max(2, v / max * 46)}px" title="${d} ${money(v, 2)}"><span>${d.slice(8)}</span></div>`).join('')
+  const models = Object.entries(stats.byModel).sort((a, b) => b[1] - a[1])
+    .map(([m, v]) => `<tr><td>${esc(m.replace('claude-', ''))}</td><td class="r">${money(v, 2)}</td></tr>`).join('')
+  say(`<div class="sub">今日（按 API 价折算）</div>
+    <div class="big">${money(stats.today, 2)}</div>
+    <div class="sub">${stats.todayMsgs} 次回复 · 近 7 天 ${money(stats.week, 2)}</div>
+    ${stats.budget ? `<div class="sub">本周 ${money(stats.period, 0)} / ${money(stats.budget, 0)} · 剩 ${Math.round(remainPct())}% · Resets ${fmtReset(stats.nextReset)}</div>` : ''}
+    <div class="bars">${bars}</div><div class="lbl"></div>
+    ${models ? `<table>${models}</table>` : ''}`, 10)
+}
+
+function turnComment(usd) {
+  if (usd < 0.05) return '这轮很省～'
+  if (usd < 0.5) return '嗯，正常发挥。'
+  if (usd < 2) return 'token 烧得也太快了...'
+  if (usd < 5) return '这轮有点贵...我 thinking 了好久...'
+  return 'user，该交钱了....'
+}
+
+function onTurn(t) {
+  if (cfg.turnSound) play('task-end-a.wav')
+  if (!cfg.turnBubble) return
+  const proj = t.cwd ? t.cwd.split(/[\\/]/).filter(Boolean).pop() : ''
+  say(`<div class="sub">${proj ? esc(proj) + ' · ' : ''}这轮做完啦</div>
+    <div class="big">${money(t.cost)}</div>
+    <div>${turnComment(t.cost)}</div>`, cfg.turnSeconds)
+  charEl.classList.add('press')
+  setTimeout(() => charEl.classList.remove('press'), 160)
+}
+
+function fmtReset(ts) {
+  const d = new Date(ts)
+  const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()]
+  const h = d.getHours() % 12 || 12
+  return `${day} ${h}:${String(d.getMinutes()).padStart(2, '0')} ${d.getHours() < 12 ? 'AM' : 'PM'}`
+}
+function remainPct() {
+  if (!stats || !stats.budget) return null
+  return Math.max(0, Math.min(100, 100 - stats.period / stats.budget * 100))
+}
+function renderBadge() {
+  if (!stats) return
+  const r = remainPct()
+  const fill = $('#fill')
+  if (r === null) { $('#pct').textContent = '点我校准'; fill.style.width = '100%'; badge.title = '还不知道你的每周额度，点一下填当前已用百分比'; return }
+  $('#pct').textContent = Math.round(r) + '% left'
+  fill.style.width = r + '%'
+  fill.classList.toggle('low', r < 10)
+  badge.title = `本周已用 ${money(stats.period, 2)} / 额度 ${money(stats.budget, 0)}
+Resets ${fmtReset(stats.nextReset)}`
+}
+
+// ---------- 透明区域点穿 ----------
+let mask = null
+function overChar(x, y) {
+  const r = charEl.getBoundingClientRect()
+  if (x < r.left || x >= r.right || y < r.top || y >= r.bottom) return false
+  if (!mask) return true
+  const px = Math.floor((x - r.left) / r.width * mask.w)
+  const py = Math.floor((y - r.top) / r.height * mask.h)
+  return mask.data[py * mask.w + px] === 1
+}
+let ignoring = true
+let drag = null
+function updateIgnore(x, y) {
+  if (drag) return
+  const el = document.elementFromPoint(x, y)
+  const solid = (el && (el === badge || badge.contains(el) || (bubble.classList.contains('show') && bubble.contains(el)))) || overChar(x, y)
+  if (solid === ignoring) { ignoring = !solid; window.xk.setIgnore(ignoring) }
+}
+document.addEventListener('mousemove', e => updateIgnore(e.clientX, e.clientY))
+document.addEventListener('mouseleave', () => { if (!drag && !ignoring) { ignoring = true; window.xk.setIgnore(true) } })
+
+// ---------- 拖动 / 点击 ----------
+charEl.addEventListener('pointerdown', async e => {
+  if (e.button !== 0) return
+  charEl.setPointerCapture(e.pointerId)
+  drag = { sx: e.screenX, sy: e.screenY, moved: false, pos: null }
+  drag.pos = await window.xk.getPos()
+})
+charEl.addEventListener('pointermove', e => {
+  if (!drag || !drag.pos) return
+  const dx = e.screenX - drag.sx, dy = e.screenY - drag.sy
+  if (!drag.moved && Math.hypot(dx, dy) > 4) { drag.moved = true; charEl.classList.add('dragging') }
+  if (drag.moved) window.xk.moveTo(drag.pos[0] + dx, drag.pos[1] + dy)
+})
+charEl.addEventListener('pointerup', e => {
+  if (!drag) return
+  const moved = drag.moved
+  drag = null
+  charEl.classList.remove('dragging')
+  if (moved) window.xk.moveEnd(); else onClick()
+  updateIgnore(e.clientX, e.clientY)
+})
+// 单击戳一下；双击弹出「问 Claude」输入框（单击延迟一点，等等看是不是双击）
+let clickTimer = null
+function onClick() {
+  if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; window.xk.quickOpen(); return }
+  clickTimer = setTimeout(() => { clickTimer = null; poke() }, 260)
+}
+
+function calibrateUI() {
+  say(`<div class="sub">现在每周额度已经用了多少？</div>
+    <div><input class="pct" id="calib" type="number" min="1" max="100" placeholder="63"> %</div>
+    <div class="sub">回车确认 · 小克按本周已花的钱反推额度</div>`, 0)
+  const inp = $('#calib')
+  inp.focus()
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { window.xk.calibrate(inp.value); say('校准好啦～', 2) }
+    if (e.key === 'Escape') bubble.classList.remove('show')
+  })
+}
+
+badge.addEventListener('click', () => (stats && !stats.budget) ? calibrateUI() : bubble.classList.contains('show') && bubble.querySelector('.bars') ? bubble.classList.remove('show') : showStats())
+bubble.addEventListener('click', e => { if (e.target.tagName !== 'INPUT') bubble.classList.remove('show') })
+document.addEventListener('contextmenu', e => { e.preventDefault(); window.xk.menu() })
+
+// ---------- 主进程消息 ----------
+window.xk.on('config', c => { cfg = c; applyScale(); renderBadge() })
+window.xk.on('stats', s => { stats = s; renderBadge() })
+window.xk.on('turn', onTurn)
+window.xk.on('poke', poke)
+window.xk.on('show-stats', showStats)
+window.xk.on('calibrate-ui', calibrateUI)
+window.xk.on('asked', () => say('交给 Claude 啦～', 3))
+window.xk.on('bye', () => say(esc(['下班啦～拜拜', 'Claude Code 关了，我也溜了～', '今天辛苦啦，记得早点睡'][Math.floor(Math.random() * 3)]), 0))
+window.xk.on('reload-lines', async () => { lines = await window.xk.lines(); say('台词和价格重新加载好啦', 3) })
+
+;(async () => {
+  lines = await window.xk.lines()
+  mask = await window.xk.mask()
+  applyScale()
+  setTimeout(() => say('小克上班啦～', 3), 600)
+})()
+</script>
+</body>
+</html>

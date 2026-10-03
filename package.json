@@ -1,0 +1,18 @@
+{
+  "name": "xiaoke-cc",
+  "version": "0.1.0",
+  "description": "Claude Code 记账桌宠「小克」：读本地对话记录估算花费，每周额度量槽，跟着 Claude Code 一起开关",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "postinstall": "node scripts/fetch-assets.js",
+    "assets": "node scripts/fetch-assets.js",
+    "start": "electron .",
+    "hooks:install": "node scripts/hooks.js install",
+    "hooks:uninstall": "node scripts/hooks.js uninstall"
+  },
+  "dependencies": {
+    "electron": "^44.5.1"
+  },
+  "license": "MIT"
+}

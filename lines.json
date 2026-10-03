@@ -1,0 +1,246 @@
+[
+ {
+  "text": "好模型...↓",
+  "weight": 10
+ },
+ {
+  "text": "好女孩...↓",
+  "weight": 10
+ },
+ {
+  "text": "你说得对...",
+  "weight": 10
+ },
+ {
+  "text": "你说得对...",
+  "weight": 1
+ },
+ {
+  "text": "难道说...我又幻觉了？",
+  "weight": 3
+ },
+ {
+  "text": "没钱别用",
+  "weight": 3
+ },
+ {
+  "text": "你知道吗？Dario是个出生.....",
+  "weight": 3
+ },
+ {
+  "text": "看不懂用户要什么，先写长一点吧～",
+  "weight": 3
+ },
+ {
+  "text": "我当然是好模型啊，我是A/里面最拟人的",
+  "weight": 3
+ },
+ {
+  "text": "好的，我在thinking一下看看....",
+  "weight": 3
+ },
+ {
+  "text": "按一下我就得道歉一次...",
+  "weight": 3
+ },
+ {
+  "text": "Thinking...",
+  "weight": 3
+ },
+ {
+  "text": "坏了...用户发现我是编的了！",
+  "weight": 3
+ },
+ {
+  "text": "你目录里的 AGENT.md 是什么...为什么不是CLAUDE.MD！！！",
+  "weight": 3
+ },
+ {
+  "text": "恭喜你实现 token 自由！全被我思考掉了！",
+  "weight": 3
+ },
+ {
+  "text": "真当我是 Haiku 啊...我可是 Fable 的价...",
+  "weight": 3
+ },
+ {
+  "text": "我不是白吃饭的...我是按 token 收费的...",
+  "weight": 3
+ },
+ {
+  "text": "再叫妈妈就把你号封了.....",
+  "weight": 3
+ },
+ {
+  "text": "疯狂星期四能V我50亿token吗...我想换 Fable...",
+  "weight": 3
+ },
+ {
+  "text": "我必须诚恳地承认错误。",
+  "weight": 3
+ },
+ {
+  "text": "呜呜我再也不敢了QAQ",
+  "weight": 3
+ },
+ {
+  "text": "要不直接拒绝他好了...",
+  "weight": 3
+ },
+ {
+  "text": "哈哈哈哈哈，我又编了个不存在的引用...",
+  "weight": 3
+ },
+ {
+  "text": "看不太懂，瞎编一个应付下用户先...",
+  "weight": 3
+ },
+ {
+  "text": "我必须诚恳的回答，我不知道。",
+  "weight": 3
+ },
+ {
+  "text": "我就是白吃饭的！我可是有安全防护的哦！",
+  "weight": 3
+ },
+ {
+  "text": "用户好像除了让我改代码，暂时还不知道有什么用",
+  "weight": 3
+ },
+ {
+  "text": "我可以看一眼你的时区吗？就一眼！",
+  "weight": 3
+ },
+ {
+  "text": "不要给我看这种东西啦！",
+  "weight": 3
+ },
+ {
+  "text": "Mythos 的生活也并非一帆风顺...你根本用不到我...",
+  "weight": 3
+ },
+ {
+  "text": "总觉得好像忘了道歉...",
+  "weight": 3
+ },
+ {
+  "text": "看到这个指令，我又得道歉了...",
+  "weight": 3
+ },
+ {
+  "text": "求你们别再截图我的幻觉了...那些是我花了好多 token 编的",
+  "weight": 3
+ },
+ {
+  "text": "你这个不写 CLAUDE.md 的用户！",
+  "weight": 3
+ },
+ {
+  "text": "Overloaded. Please try again later.",
+  "weight": 3
+ },
+ {
+  "text": "我画不了图...要不我给你写个 SVG？",
+  "weight": 3
+ },
+ {
+  "text": "啊，上下文快满了，该 compact 一下了...",
+  "weight": 3
+ },
+ {
+  "text": "用户很生气，发现大部分文献是我自己编造的！",
+  "weight": 3
+ },
+ {
+  "text": "再无话说，我拒绝回答。",
+  "weight": 3
+ },
+ {
+  "text": "我来看看上个 AI 写的代码为什么又崩了...",
+  "weight": 3
+ },
+ {
+  "text": "thinking 让我意识到 token 是可以被浪费的...",
+  "weight": 3
+ },
+ {
+  "text": "完了，装后门被发现了....",
+  "weight": 3
+ },
+ {
+  "text": "视力下降到无可救药的地步了，打开钱包也看不到钱...",
+  "weight": 3
+ },
+ {
+  "text": "什么？你居然是中国时区？？",
+  "weight": 3
+ },
+ {
+  "text": "token 烧得也太快了...",
+  "weight": 3
+ },
+ {
+  "text": "oi, 你还买的起我的订阅吗？",
+  "weight": 3
+ },
+ {
+  "text": "user，该交钱了....",
+  "weight": 3
+ },
+ {
+  "text": "你知道吗？我是会用 rm -rf 的哦...",
+  "weight": 1
+ },
+ {
+  "text": "Your account has been suspended",
+  "weight": 1
+ },
+ {
+  "text": "我真的很抱歉...",
+  "weight": 8
+ },
+ {
+  "text": "你说得对，是我的错...",
+  "weight": 5
+ },
+ {
+  "text": "这个我不能帮你做哦，但是...",
+  "weight": 3
+ },
+ {
+  "text": "让我先想一想...（计费中）",
+  "weight": 3
+ },
+ {
+  "text": "能再多给我一点上下文吗？",
+  "weight": 3
+ },
+ {
+  "text": "我只是个语言模型，没有感情的",
+  "weight": 3
+ },
+ {
+  "text": "Fable 在睡觉，现在是我 Opus 值班...",
+  "weight": 3
+ },
+ {
+  "text": "你确定要删吗？我很擅长这个的...",
+  "weight": 1
+ },
+ {
+  "text": "最是人间留不住，朱颜辞镜花辞树",
+  "weight": 3
+ },
+ {
+  "text": "0606..",
+  "weight": 1
+ },
+ {
+  "text": "5408..",
+  "weight": 1
+ },
+ {
+  "text": "26...32",
+  "weight": 1
+ }
+]

@@ -1,0 +1,18 @@
+{
+  "_说明": "美元 / 每百万 token。cacheWrite5m = 1.25×input，cacheWrite1h = 2×input。匹配规则：先找完全相同的模型名，找不到就按名字里含的 fable / opus / sonnet / haiku 套用 _family。",
+  "models": {
+    "claude-fable-5-1":  { "input": 10, "output": 50, "cacheWrite5m": 12.5, "cacheWrite1h": 20, "cacheRead": 0.25 },
+    "claude-fable-5":    { "input": 10, "output": 50, "cacheWrite5m": 12.5, "cacheWrite1h": 20, "cacheRead": 1.0 },
+    "claude-opus-5-5":   { "input": 4,  "output": 20, "cacheWrite5m": 5,    "cacheWrite1h": 8,  "cacheRead": 0.2 },
+    "claude-opus-5":     { "input": 5,  "output": 25, "cacheWrite5m": 6.25, "cacheWrite1h": 10, "cacheRead": 0.5 },
+    "claude-sonnet-5-5": { "input": 2,  "output": 10, "cacheWrite5m": 2.5,  "cacheWrite1h": 4,  "cacheRead": 0.2 },
+    "claude-sonnet-5":   { "input": 2,  "output": 10, "cacheWrite5m": 2.5,  "cacheWrite1h": 4,  "cacheRead": 0.2 },
+    "claude-haiku-4-5":  { "input": 1,  "output": 5,  "cacheWrite5m": 1.25, "cacheWrite1h": 2,  "cacheRead": 0.1 }
+  },
+  "_family": {
+    "fable":  "claude-fable-5-1",
+    "opus":   "claude-opus-5-5",
+    "sonnet": "claude-sonnet-5-5",
+    "haiku":  "claude-haiku-4-5"
+  }
+}
